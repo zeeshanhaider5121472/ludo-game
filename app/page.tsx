@@ -68,8 +68,6 @@ const pathRed = [
   "7-5",
   "7-6",
 ];
-const pathRedBase = ["1-1", "1-4", "4-1", "4-4"];
-const pathGreenBase = ["1-10", "1-13", "4-10", "4-13"];
 const pathGreen = [
   "1-8",
   "2-8",
@@ -88,8 +86,49 @@ const pathGreen = [
   "8-12",
   "8-11",
   "8-10",
+  "8-9",
+  "9-8",
+  "10-8",
+  "11-8",
+  "12-8",
+  "13-8",
+  "14-8",
+  "14-7",
+  "14-6",
+  "13-6",
+  "12-6",
+  "11-6",
+  "10-6",
+  "9-6",
+  "8-5",
+  "8-4",
+  "8-3",
+  "8-2",
+  "8-1",
+  "8-0",
+  "7-0",
+  "6-0",
+  "6-1",
+  "6-2",
+  "6-3",
+  "6-4",
+  "6-5",
+  "5-6",
+  "4-6",
+  "3-6",
+  "2-6",
+  "1-6",
+  "0-6",
+  "0-7",
+  "1-7",
+  "2-7",
+  "3-7",
+  "4-7",
+  "5-7",
+  "6-7",
 ];
-
+const pathRedBase = ["1-1", "1-4", "4-1", "4-4"];
+const pathGreenBase = ["1-10", "1-13", "4-10", "4-13"];
 const getCellColor = (id: string) => {
   const [r, c] = id.split("-").map(Number);
   // Bases
@@ -118,6 +157,7 @@ export default function Home() {
   const [redThree, setRedThree] = useState(pathRedBase[2]);
   const [redFour, setRedFour] = useState(pathRedBase[3]);
   const [greenOne, setGreenOne] = useState(pathGreenBase[0]);
+  // const [greenOne, setGreenOne] = useState(pathGreen[56]);
   const [greenTwo, setGreenTwo] = useState(pathGreenBase[1]);
   const [greenThree, setGreenThree] = useState(pathGreenBase[2]);
   const [greenFour, setGreenFour] = useState(pathGreenBase[3]);
