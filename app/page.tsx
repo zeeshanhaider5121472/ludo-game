@@ -1,63 +1,270 @@
-import Image from "next/image";
+"use client";
+import { useState } from "react";
+
+const boardIds: string[] = [];
+for (let r = 0; r < 15; r++) {
+  for (let c = 0; c < 15; c++) {
+    boardIds.push(`${r}-${c}`);
+  }
+}
+
+//red token path
+const pathRed = [
+  "6-1",
+  "6-2",
+  "6-3",
+  "6-4",
+  "6-5",
+  "5-6",
+  "4-6",
+  "3-6",
+  "2-6",
+  "1-6",
+  "0-6",
+  "0-7",
+  "0-8",
+  "1-8",
+  "2-8",
+  "3-8",
+  "4-8",
+  "5-8",
+  "6-9",
+  "6-10",
+  "6-11",
+  "6-12",
+  "6-13",
+  "6-14",
+  "7-14",
+  "8-14",
+  "8-13",
+  "8-12",
+  "8-11",
+  "8-10",
+  "8-9",
+  "9-8",
+  "10-8",
+  "11-8",
+  "12-8",
+  "13-8",
+  "14-8",
+  "14-7",
+  "14-6",
+  "13-6",
+  "12-6",
+  "11-6",
+  "10-6",
+  "9-6",
+  "8-5",
+  "8-4",
+  "8-3",
+  "8-2",
+  "8-1",
+  "8-0",
+  "7-0",
+  "7-1",
+  "7-2",
+  "7-3",
+  "7-4",
+  "7-5",
+  "7-6",
+];
+const pathRedBase = ["1-1", "1-4", "4-1", "4-4"];
+const pathGreenBase = ["1-10", "1-13", "4-10", "4-13"];
+const pathGreen = [
+  "1-8",
+  "2-8",
+  "3-8",
+  "4-8",
+  "5-8",
+  "6-9",
+  "6-10",
+  "6-11",
+  "6-12",
+  "6-13",
+  "6-14",
+  "7-14",
+  "8-14",
+  "8-13",
+  "8-12",
+  "8-11",
+  "8-10",
+];
+
+const getCellColor = (id: string) => {
+  const [r, c] = id.split("-").map(Number);
+  // Bases
+  if (r <= 5 && c <= 5) return "bg-red-200";
+  if (r === 7 && c >= 1 && c <= 5) return "bg-red-200";
+  if (r === 6 && c === 1) return "bg-red-200";
+  if (r <= 5 && c >= 9) return "bg-green-200";
+  if (r === 1 && c === 8) return "bg-green-200";
+  if (r >= 1 && r <= 5 && c === 7) return "bg-green-200";
+  if (r >= 9 && c >= 9) return "bg-yellow-200";
+  if (r === 7 && c >= 9 && c <= 13) return "bg-yellow-200";
+  if (r === 8 && c === 13) return "bg-yellow-200";
+  if (r >= 9 && c <= 5) return "bg-blue-200";
+  if (r >= 9 && r <= 13 && c === 7) return "bg-blue-200";
+  if (r === 13 && c === 6) return "bg-blue-200";
+  // Center
+  if (r >= 6 && r <= 8 && c >= 6 && c <= 8) return "bg-gray-400";
+  // Path
+  return "bg-white";
+};
 
 export default function Home() {
+  // Initial positions of tokens
+  const [redOne, setRedOne] = useState(pathRedBase[0]);
+  const [redTwo, setRedTwo] = useState(pathRedBase[1]);
+  const [redThree, setRedThree] = useState(pathRedBase[2]);
+  const [redFour, setRedFour] = useState(pathRedBase[3]);
+  const [greenOne, setGreenOne] = useState(pathGreenBase[0]);
+  const [greenTwo, setGreenTwo] = useState(pathGreenBase[1]);
+  const [greenThree, setGreenThree] = useState(pathGreenBase[2]);
+  const [greenFour, setGreenFour] = useState(pathGreenBase[3]);
+
+  const [currentPlayer, setCurrentPlayer] = useState<"red" | "green">("red");
+
+  const [diceValue, setDiceValue] = useState<number | null>(null);
+
+  const moveToken = (
+    token: string,
+    setToken: (val: string) => void,
+    path: string[],
+  ) => {
+    if (!diceValue) return;
+
+    const currentIndex = path.indexOf(token);
+    const newIndex = currentIndex + diceValue;
+
+    if (newIndex < path.length) {
+      setToken(path[newIndex]);
+    }
+    // Reset dice after move
+    setDiceValue(null);
+  };
+
+  const rollDice = () => {
+    const roll = Math.floor(Math.random() * 6) + 1;
+    setDiceValue(roll);
+    // Switch turn after rolling
+    setCurrentPlayer((prev) => (prev === "red" ? "green" : "red"));
+    const moveToken = (
+      token: string,
+      setToken: (val: string) => void,
+      path: string[],
+    ) => {
+      if (!diceValue) return;
+
+      const currentIndex = path.indexOf(token);
+      const newIndex = currentIndex + diceValue;
+
+      if (newIndex < path.length) {
+        setToken(path[newIndex]);
+      }
+      // Reset dice after move
+      setDiceValue(null);
+    };
+  };
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+        <div>
+          <h1 className="text-6xl font-bold text-gray-900 dark:text-white">
+            Ludo Game
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          <p className="mt-3 text-2xl text-gray-600 dark:text-gray-300">
+            A simple Ludo game built with Next.js and Tailwind CSS.
           </p>
+          <p className="mt-3 text-xl text-gray-600 dark:text-gray-300">
+            Current Player: {currentPlayer === "red" ? "Red" : "Green"}
+          </p>
+
+          {/* Game Board and Players */}
+          <div className="grid grid-cols-15 grid-rows-15 w-150 h-150 border-4 border-gray-800 gap-px bg-gray-800">
+            {boardIds.map((id) => {
+              return (
+                <div
+                  key={id}
+                  id={id}
+                  onClick={() => {
+                    if (currentPlayer === "red") {
+                      if (redOne === id) moveToken(redOne, setRedOne, pathRed);
+                      else if (redTwo === id)
+                        moveToken(redTwo, setRedTwo, pathRed);
+                      else if (redThree === id)
+                        moveToken(redThree, setRedThree, pathRed);
+                      else if (redFour === id)
+                        moveToken(redFour, setRedFour, pathRed);
+                    } else if (currentPlayer === "green") {
+                      if (greenOne === id)
+                        moveToken(greenOne, setGreenOne, pathGreen);
+                      else if (greenTwo === id)
+                        moveToken(greenTwo, setGreenTwo, pathGreen);
+                      else if (greenThree === id)
+                        moveToken(greenThree, setGreenThree, pathGreen);
+                      else if (greenFour === id)
+                        moveToken(greenFour, setGreenFour, pathGreen);
+                    }
+                  }}
+                  className={`relative flex items-center justify-center border border-gray-300 ${getCellColor(id)}`}
+                >
+                  {redOne === id && (
+                    <div
+                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-red-500`}
+                    />
+                  )}
+                  {redTwo === id && (
+                    <div
+                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-red-500`}
+                    />
+                  )}
+                  {redThree === id && (
+                    <div
+                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-red-500`}
+                    />
+                  )}
+                  {redFour === id && (
+                    <div
+                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-red-500`}
+                    />
+                  )}
+                  {greenOne === id && (
+                    <div
+                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-green-500`}
+                    />
+                  )}
+                  {greenTwo === id && (
+                    <div
+                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-green-500`}
+                    />
+                  )}
+                  {greenThree === id && (
+                    <div
+                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-green-500`}
+                    />
+                  )}
+                  {greenFour === id && (
+                    <div
+                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-green-500`}
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        {/* Dice */}
+        <div className="mt-4">
+          <button
+            onClick={rollDice}
+            className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            Roll Dice
+          </button>
+          {diceValue && (
+            <p className="mt-2 text-xl">Dice Rolled: {diceValue}</p>
+          )}
         </div>
       </main>
     </div>
