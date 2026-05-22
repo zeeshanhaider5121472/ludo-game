@@ -127,8 +127,128 @@ const pathGreen = [
   "5-7",
   "6-7",
 ];
+const pathBlue = [
+  "13-6",
+  "12-6",
+  "11-6",
+  "10-6",
+  "9-6",
+  "8-5",
+  "8-4",
+  "8-3",
+  "8-2",
+  "8-1",
+  "8-0",
+  "7-0",
+  "6-0",
+  "6-1",
+  "6-2",
+  "6-3",
+  "6-4",
+  "6-5",
+  "5-6",
+  "4-6",
+  "3-6",
+  "2-6",
+  "1-6",
+  "0-6",
+  "0-7",
+  "0-8",
+  "1-8",
+  "2-8",
+  "3-8",
+  "4-8",
+  "5-8",
+  "6-9",
+  "6-10",
+  "6-11",
+  "6-12",
+  "6-13",
+  "6-14",
+  "7-14",
+  "8-14",
+  "8-13",
+  "8-12",
+  "8-11",
+  "8-10",
+  "8-9",
+  "9-8",
+  "10-8",
+  "11-8",
+  "12-8",
+  "13-8",
+  "14-8",
+  "14-7",
+  "13-7",
+  "12-7",
+  "11-7",
+  "10-7",
+  "9-7",
+  "8-7",
+];
+const pathYellow = [
+  "8-13",
+  "8-12",
+  "8-11",
+  "8-10",
+  "8-9",
+  "9-8",
+  "10-8",
+  "11-8",
+  "12-8",
+  "13-8",
+  "14-8",
+  "14-7",
+  "14-6",
+  "13-6",
+  "12-6",
+  "11-6",
+  "10-6",
+  "9-6",
+  "8-5",
+  "8-4",
+  "8-3",
+  "8-2",
+  "8-1",
+  "8-0",
+  "7-0",
+  "6-0",
+  "6-1",
+  "6-2",
+  "6-3",
+  "6-4",
+  "6-5",
+  "5-6",
+  "4-6",
+  "3-6",
+  "2-6",
+  "1-6",
+  "0-6",
+  "0-7",
+  "0-8",
+  "1-8",
+  "2-8",
+  "3-8",
+  "4-8",
+  "5-8",
+  "6-9",
+  "6-10",
+  "6-11",
+  "6-12",
+  "6-13",
+  "6-14",
+  "7-14",
+  "7-13",
+  "7-12",
+  "7-11",
+  "7-10",
+  "7-9",
+  "7-8",
+];
+const pathBlueBase = ["10-1", "10-4", "13-1", "13-4"];
 const pathRedBase = ["1-1", "1-4", "4-1", "4-4"];
 const pathGreenBase = ["1-10", "1-13", "4-10", "4-13"];
+const pathYellowBase = ["10-10", "10-13", "13-10", "13-13"];
 const getCellColor = (id: string) => {
   const [r, c] = id.split("-").map(Number);
   // Bases
@@ -152,24 +272,37 @@ const getCellColor = (id: string) => {
 
 export default function Home() {
   // Initial positions of tokens
-  const [redOne, setRedOne] = useState(pathRedBase[0]);
+  // const [redOne, setRedOne] = useState(pathRedBase[0]);
+  const [redOne, setRedOne] = useState(pathRed[1]);
   const [redTwo, setRedTwo] = useState(pathRedBase[1]);
   const [redThree, setRedThree] = useState(pathRedBase[2]);
   const [redFour, setRedFour] = useState(pathRedBase[3]);
   const [greenOne, setGreenOne] = useState(pathGreenBase[0]);
-  // const [greenOne, setGreenOne] = useState(pathGreen[56]);
   const [greenTwo, setGreenTwo] = useState(pathGreenBase[1]);
   const [greenThree, setGreenThree] = useState(pathGreenBase[2]);
   const [greenFour, setGreenFour] = useState(pathGreenBase[3]);
+  const [blueOne, setBlueOne] = useState(pathBlueBase[0]);
+  const [blueTwo, setBlueTwo] = useState(pathBlueBase[1]);
+  const [blueThree, setBlueThree] = useState(pathBlueBase[2]);
+  // const [blueFour, setBlueFour] = useState(pathBlueBase[3]);
+  const [blueFour, setBlueFour] = useState(pathBlue[15]);
+  const [yellowOne, setYellowOne] = useState(pathYellowBase[0]);
+  const [yellowTwo, setYellowTwo] = useState(pathYellowBase[1]);
+  const [yellowThree, setYellowThree] = useState(pathYellowBase[2]);
+  const [yellowFour, setYellowFour] = useState(pathYellowBase[3]);
 
-  const [currentPlayer, setCurrentPlayer] = useState<"red" | "green">("red");
+  const [currentPlayer, setCurrentPlayer] = useState<
+    "red" | "green" | "yellow" | "blue"
+  >("red");
 
   const [redAllBase, setRedAllBase] = useState(false);
   const [greenAllBase, setGreenAllBase] = useState(false);
+  const [blueAllBase, setBlueAllBase] = useState(false);
+  const [yellowAllBase, setYellowAllBase] = useState(false);
 
   const [diceValue, setDiceValue] = useState<number | null>(null);
 
-  const checkAllTokensInBase = (color: "red" | "green") => {
+  const checkAllTokensInBase = (color: "red" | "green" | "yellow" | "blue") => {
     if (color === "red") {
       const allInBase = [redOne, redTwo, redThree, redFour].every((e) =>
         pathRedBase.includes(e),
@@ -194,12 +327,44 @@ export default function Home() {
         setGreenAllBase(false);
       }
       return allInBase;
+    } else if (color === "blue") {
+      const allInBase = [blueOne, blueTwo, blueThree, blueFour].every((e) =>
+        pathBlueBase.includes(e),
+      );
+      if (allInBase) {
+        console.log("Blue tokens in base");
+        setBlueAllBase(true);
+      } else {
+        console.log("Blue tokens not in base");
+        setBlueAllBase(false);
+      }
+      return allInBase;
+    } else if (color === "yellow") {
+      const allInBase = [yellowOne, yellowTwo, yellowThree, yellowFour].every(
+        (e) => pathYellowBase.includes(e),
+      );
+      if (allInBase) {
+        console.log("Yellow tokens in base");
+        setYellowAllBase(true);
+      } else {
+        console.log("Yellow tokens not in base");
+        setYellowAllBase(false);
+      }
+      return allInBase;
     }
   };
 
-  const passToNextPlayer = (color: "red" | "green") => {
+  const passToNextPlayer = (color: "red" | "green" | "yellow" | "blue") => {
     console.log(`Passing turn from ${color} to next player`);
-    setCurrentPlayer((prev) => (prev === "red" ? "green" : "red"));
+    setCurrentPlayer((prev) =>
+      prev === "red"
+        ? "green"
+        : prev === "green"
+          ? "yellow"
+          : prev === "yellow"
+            ? "blue"
+            : "red",
+    );
     setDiceValue(null);
   };
 
@@ -215,23 +380,31 @@ export default function Home() {
     } // Token not on path
     if (
       (diceValue === 6 && pathRedBase.includes(token)) ||
-      (diceValue === 6 && pathGreenBase.includes(token))
+      (diceValue === 6 && pathGreenBase.includes(token)) ||
+      (diceValue === 6 && pathBlueBase.includes(token)) ||
+      (diceValue === 6 && pathYellowBase.includes(token))
     ) {
       console.log("got 6, moving out of base");
       setToken(path[0]);
       setDiceValue(null);
       return;
     }
-    console.log(
-      `Moving token from ${token} by ${diceValue} steps and path is ${path}`,
-    );
+    console.log(`Moving token from ${token} by ${diceValue} steps`);
     const currentIndex = path.indexOf(token);
     const newIndex = currentIndex + diceValue;
 
     if (newIndex < path.length) {
       setToken(path[newIndex]);
     }
-    setCurrentPlayer((prev) => (prev === "red" ? "green" : "red"));
+    setCurrentPlayer((prev) =>
+      prev === "red"
+        ? "green"
+        : prev === "green"
+          ? "yellow"
+          : prev === "yellow"
+            ? "blue"
+            : "red",
+    );
 
     // Reset dice after move
     setDiceValue(null);
@@ -258,8 +431,15 @@ export default function Home() {
           <p className="mt-3 text-2xl text-gray-600 dark:text-gray-300">
             A simple Ludo game built with Next.js and Tailwind CSS.
           </p>
-          <p className="mt-3 text-xl text-gray-600 dark:text-gray-300">
-            Current Player: {currentPlayer === "red" ? "Red" : "Green"}
+          <p className="mt-3 text-xl text-purple-500 dark:text-gray-300">
+            Current Player:{" "}
+            {currentPlayer === "red"
+              ? "Red"
+              : currentPlayer === "green"
+                ? "Green"
+                : currentPlayer === "blue"
+                  ? "Blue"
+                  : "Yellow"}
           </p>
 
           {/* Game Board and Players */}
@@ -287,6 +467,24 @@ export default function Home() {
                         moveToken(greenThree, setGreenThree, pathGreen);
                       else if (greenFour === id)
                         moveToken(greenFour, setGreenFour, pathGreen);
+                    } else if (currentPlayer === "blue") {
+                      if (blueOne === id)
+                        moveToken(blueOne, setBlueOne, pathBlue);
+                      else if (blueTwo === id)
+                        moveToken(blueTwo, setBlueTwo, pathBlue);
+                      else if (blueThree === id)
+                        moveToken(blueThree, setBlueThree, pathBlue);
+                      else if (blueFour === id)
+                        moveToken(blueFour, setBlueFour, pathBlue);
+                    } else if (currentPlayer === "yellow") {
+                      if (yellowOne === id)
+                        moveToken(yellowOne, setYellowOne, pathYellow);
+                      else if (yellowTwo === id)
+                        moveToken(yellowTwo, setYellowTwo, pathYellow);
+                      else if (yellowThree === id)
+                        moveToken(yellowThree, setYellowThree, pathYellow);
+                      else if (yellowFour === id)
+                        moveToken(yellowFour, setYellowFour, pathYellow);
                     }
                   }}
                   className={`relative flex items-center justify-center border border-gray-300 ${getCellColor(id)}`}
@@ -329,6 +527,46 @@ export default function Home() {
                   {greenFour === id && (
                     <div
                       className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-green-500`}
+                    />
+                  )}
+                  {blueOne === id && (
+                    <div
+                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-blue-500`}
+                    />
+                  )}
+                  {blueTwo === id && (
+                    <div
+                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-blue-500`}
+                    />
+                  )}
+                  {blueThree === id && (
+                    <div
+                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-blue-500`}
+                    />
+                  )}
+                  {blueFour === id && (
+                    <div
+                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-blue-500`}
+                    />
+                  )}
+                  {yellowOne === id && (
+                    <div
+                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-yellow-500`}
+                    />
+                  )}
+                  {yellowTwo === id && (
+                    <div
+                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-yellow-500`}
+                    />
+                  )}
+                  {yellowThree === id && (
+                    <div
+                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-yellow-500`}
+                    />
+                  )}
+                  {yellowFour === id && (
+                    <div
+                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-yellow-500`}
                     />
                   )}
                 </div>
