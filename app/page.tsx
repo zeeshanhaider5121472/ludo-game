@@ -584,12 +584,18 @@ export default function Home() {
             Roll Dice
           </button>
 
-          <button
-            onClick={() => passToNextPlayer(currentPlayer)}
-            className="px-6 py-3 ml-5 bg-yellow-500 text-white rounded-lg shadow-md disabled:bg-blue-200"
-          >
-            Pass
-          </button>
+          {/* Conditionally render Pass button */}
+          {(currentPlayer === "red" && redAllBase) ||
+          (currentPlayer === "green" && greenAllBase) ||
+          (currentPlayer === "blue" && blueAllBase) ||
+          (currentPlayer === "yellow" && yellowAllBase) ? (
+            <button
+              onClick={() => passToNextPlayer(currentPlayer)}
+              className="px-6 py-3 ml-5 bg-yellow-500 text-white rounded-lg shadow-md"
+            >
+              Pass
+            </button>
+          ) : null}
 
           <button
             onClick={() => checkAllTokensInBase(currentPlayer)}
