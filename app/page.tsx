@@ -124,7 +124,44 @@ export default function Home() {
 
   const [currentPlayer, setCurrentPlayer] = useState<"red" | "green">("red");
 
+  const [redAllBase, setRedAllBase] = useState(false);
+  const [greenAllBase, setGreenAllBase] = useState(false);
+
   const [diceValue, setDiceValue] = useState<number | null>(null);
+
+  const checkAllTokensInBase = (color: "red" | "green") => {
+    if (color === "red") {
+      const allInBase = [redOne, redTwo, redThree, redFour].every((e) =>
+        pathRedBase.includes(e),
+      );
+      if (allInBase) {
+        console.log("Red tokens in base");
+        setRedAllBase(true);
+      } else {
+        console.log("Red tokens not in base");
+        setRedAllBase(false);
+      }
+      return allInBase;
+    } else if (color === "green") {
+      const allInBase = [greenOne, greenTwo, greenThree, greenFour].every((e) =>
+        pathGreenBase.includes(e),
+      );
+      if (allInBase) {
+        console.log("Green tokens in base");
+        setGreenAllBase(true);
+      } else {
+        console.log("Green tokens not in base");
+        setGreenAllBase(false);
+      }
+      return allInBase;
+    }
+  };
+
+  const passToNextPlayer = (color: "red" | "green") => {
+    console.log(`Passing turn from ${color} to next player`);
+    setCurrentPlayer((prev) => (prev === "red" ? "green" : "red"));
+    setDiceValue(null);
+  };
 
   const moveToken = (
     token: string,
@@ -132,38 +169,43 @@ export default function Home() {
     path: string[],
   ) => {
     if (!diceValue) return;
-
+    if (!path.includes(token) && diceValue !== 6) {
+      console.log("Token not on path, can't move");
+      return;
+    } // Token not on path
+    if (
+      (diceValue === 6 && pathRedBase.includes(token)) ||
+      (diceValue === 6 && pathGreenBase.includes(token))
+    ) {
+      console.log("got 6, moving out of base");
+      setToken(path[0]);
+      setDiceValue(null);
+      return;
+    }
+    console.log(
+      `Moving token from ${token} by ${diceValue} steps and path is ${path}`,
+    );
     const currentIndex = path.indexOf(token);
     const newIndex = currentIndex + diceValue;
 
     if (newIndex < path.length) {
       setToken(path[newIndex]);
     }
+    setCurrentPlayer((prev) => (prev === "red" ? "green" : "red"));
+
     // Reset dice after move
     setDiceValue(null);
   };
 
   const rollDice = () => {
     const roll = Math.floor(Math.random() * 6) + 1;
+    // let roll = 2;
     setDiceValue(roll);
+    checkAllTokensInBase(currentPlayer);
     // Switch turn after rolling
-    setCurrentPlayer((prev) => (prev === "red" ? "green" : "red"));
-    const moveToken = (
-      token: string,
-      setToken: (val: string) => void,
-      path: string[],
-    ) => {
-      if (!diceValue) return;
-
-      const currentIndex = path.indexOf(token);
-      const newIndex = currentIndex + diceValue;
-
-      if (newIndex < path.length) {
-        setToken(path[newIndex]);
-      }
-      // Reset dice after move
-      setDiceValue(null);
-    };
+    // roll != 6
+    //   ? setCurrentPlayer((prev) => (prev === "red" ? "green" : "red"))
+    //   : null;
   };
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -258,10 +300,26 @@ export default function Home() {
         <div className="mt-4">
           <button
             onClick={rollDice}
-            className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md"
+            className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md disabled:bg-blue-200"
+            disabled={diceValue !== null}
           >
             Roll Dice
           </button>
+
+          <button
+            onClick={() => passToNextPlayer(currentPlayer)}
+            className="px-6 py-3 ml-5 bg-yellow-500 text-white rounded-lg shadow-md disabled:bg-blue-200"
+          >
+            Pass
+          </button>
+
+          <button
+            onClick={() => checkAllTokensInBase(currentPlayer)}
+            className="px-6 py-3 ml-5 bg-green-500 text-white rounded-lg shadow-md disabled:bg-blue-200"
+          >
+            Check All in Base
+          </button>
+
           {diceValue && (
             <p className="mt-2 text-xl">Dice Rolled: {diceValue}</p>
           )}
