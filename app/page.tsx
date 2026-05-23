@@ -302,6 +302,37 @@ export default function Home() {
 
   const [diceValue, setDiceValue] = useState<number | null>(null);
 
+  const redTokens = [redOne, redTwo, redThree, redFour];
+  const greenTokens = [greenOne, greenTwo, greenThree, greenFour];
+  const blueTokens = [blueOne, blueTwo, blueThree, blueFour];
+  const yellowTokens = [yellowOne, yellowTwo, yellowThree, yellowFour];
+  const players = {
+    red: {
+      tokens: redTokens,
+      setFns: [setRedOne, setRedTwo, setRedThree, setRedFour],
+      path: pathRed,
+      color: "bg-red-500",
+    },
+    green: {
+      tokens: greenTokens,
+      setFns: [setGreenOne, setGreenTwo, setGreenThree, setGreenFour],
+      path: pathGreen,
+      color: "bg-green-500",
+    },
+    blue: {
+      tokens: blueTokens,
+      setFns: [setBlueOne, setBlueTwo, setBlueThree, setBlueFour],
+      path: pathBlue,
+      color: "bg-blue-500",
+    },
+    yellow: {
+      tokens: yellowTokens,
+      setFns: [setYellowOne, setYellowTwo, setYellowThree, setYellowFour],
+      path: pathYellow,
+      color: "bg-yellow-500",
+    },
+  };
+
   const checkAllTokensInBase = (color: "red" | "green" | "yellow" | "blue") => {
     if (color === "red") {
       const allInBase = [redOne, redTwo, redThree, redFour].every((e) =>
@@ -389,6 +420,7 @@ export default function Home() {
       setDiceValue(null);
       return;
     }
+
     console.log(`Moving token from ${token} by ${diceValue} steps`);
     const currentIndex = path.indexOf(token);
     const newIndex = currentIndex + diceValue;
@@ -396,15 +428,16 @@ export default function Home() {
     if (newIndex < path.length) {
       setToken(path[newIndex]);
     }
-    setCurrentPlayer((prev) =>
-      prev === "red"
-        ? "green"
-        : prev === "green"
-          ? "yellow"
-          : prev === "yellow"
-            ? "blue"
-            : "red",
-    );
+    diceValue != 6 &&
+      setCurrentPlayer((prev) =>
+        prev === "red"
+          ? "green"
+          : prev === "green"
+            ? "yellow"
+            : prev === "yellow"
+              ? "blue"
+              : "red",
+      );
 
     // Reset dice after move
     setDiceValue(null);
@@ -450,124 +483,22 @@ export default function Home() {
                   key={id}
                   id={id}
                   onClick={() => {
-                    if (currentPlayer === "red") {
-                      if (redOne === id) moveToken(redOne, setRedOne, pathRed);
-                      else if (redTwo === id)
-                        moveToken(redTwo, setRedTwo, pathRed);
-                      else if (redThree === id)
-                        moveToken(redThree, setRedThree, pathRed);
-                      else if (redFour === id)
-                        moveToken(redFour, setRedFour, pathRed);
-                    } else if (currentPlayer === "green") {
-                      if (greenOne === id)
-                        moveToken(greenOne, setGreenOne, pathGreen);
-                      else if (greenTwo === id)
-                        moveToken(greenTwo, setGreenTwo, pathGreen);
-                      else if (greenThree === id)
-                        moveToken(greenThree, setGreenThree, pathGreen);
-                      else if (greenFour === id)
-                        moveToken(greenFour, setGreenFour, pathGreen);
-                    } else if (currentPlayer === "blue") {
-                      if (blueOne === id)
-                        moveToken(blueOne, setBlueOne, pathBlue);
-                      else if (blueTwo === id)
-                        moveToken(blueTwo, setBlueTwo, pathBlue);
-                      else if (blueThree === id)
-                        moveToken(blueThree, setBlueThree, pathBlue);
-                      else if (blueFour === id)
-                        moveToken(blueFour, setBlueFour, pathBlue);
-                    } else if (currentPlayer === "yellow") {
-                      if (yellowOne === id)
-                        moveToken(yellowOne, setYellowOne, pathYellow);
-                      else if (yellowTwo === id)
-                        moveToken(yellowTwo, setYellowTwo, pathYellow);
-                      else if (yellowThree === id)
-                        moveToken(yellowThree, setYellowThree, pathYellow);
-                      else if (yellowFour === id)
-                        moveToken(yellowFour, setYellowFour, pathYellow);
-                    }
+                    const { tokens, setFns, path } = players[currentPlayer];
+                    tokens.forEach((token, idx) => {
+                      if (token === id) moveToken(token, setFns[idx], path);
+                    });
                   }}
                   className={`relative flex items-center justify-center border border-gray-300 ${getCellColor(id)}`}
                 >
-                  {redOne === id && (
-                    <div
-                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-red-500`}
-                    />
-                  )}
-                  {redTwo === id && (
-                    <div
-                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-red-500`}
-                    />
-                  )}
-                  {redThree === id && (
-                    <div
-                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-red-500`}
-                    />
-                  )}
-                  {redFour === id && (
-                    <div
-                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-red-500`}
-                    />
-                  )}
-                  {greenOne === id && (
-                    <div
-                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-green-500`}
-                    />
-                  )}
-                  {greenTwo === id && (
-                    <div
-                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-green-500`}
-                    />
-                  )}
-                  {greenThree === id && (
-                    <div
-                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-green-500`}
-                    />
-                  )}
-                  {greenFour === id && (
-                    <div
-                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-green-500`}
-                    />
-                  )}
-                  {blueOne === id && (
-                    <div
-                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-blue-500`}
-                    />
-                  )}
-                  {blueTwo === id && (
-                    <div
-                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-blue-500`}
-                    />
-                  )}
-                  {blueThree === id && (
-                    <div
-                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-blue-500`}
-                    />
-                  )}
-                  {blueFour === id && (
-                    <div
-                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-blue-500`}
-                    />
-                  )}
-                  {yellowOne === id && (
-                    <div
-                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-yellow-500`}
-                    />
-                  )}
-                  {yellowTwo === id && (
-                    <div
-                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-yellow-500`}
-                    />
-                  )}
-                  {yellowThree === id && (
-                    <div
-                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-yellow-500`}
-                    />
-                  )}
-                  {yellowFour === id && (
-                    <div
-                      className={`w-6 h-6 rounded-full shadow-lg border-2 border-white bg-yellow-500`}
-                    />
+                  {Object.entries(players).map(([player, { tokens, color }]) =>
+                    tokens.map((token) =>
+                      token === id ? (
+                        <div
+                          key={`${player}-${token}`}
+                          className={`w-6 h-6 rounded-full shadow-lg border-2 border-white ${color}`}
+                        />
+                      ) : null,
+                    ),
                   )}
                 </div>
               );
@@ -612,3 +543,7 @@ export default function Home() {
     </div>
   );
 }
+// need to add killing logic, winning logic, and some UI improvements like showing dice value on the dice button and highlighting current player's tokens and changing color of the current player to the current player
+//issues if 6 in dice and token is not in base it won't give a new turn, it just passes to other player
+//issue pass button not working
+//add a home screen and a winner screen
