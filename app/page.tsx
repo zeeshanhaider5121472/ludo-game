@@ -275,24 +275,22 @@ const getCellColor = (id: string) => {
 
 export default function Home() {
   // Initial positions of tokens
-  // const [redOne, setRedOne] = useState(pathRedBase[0]);
-  const [redOne, setRedOne] = useState(pathRed[56]);
-  const [redTwo, setRedTwo] = useState(pathRed[56]);
-  const [redThree, setRedThree] = useState(pathRed[56]);
-  const [redFour, setRedFour] = useState(pathRed[55]);
-  const [greenOne, setGreenOne] = useState(pathGreen[56]);
-  const [greenTwo, setGreenTwo] = useState(pathGreen[56]);
-  const [greenThree, setGreenThree] = useState(pathGreen[56]);
-  const [greenFour, setGreenFour] = useState(pathGreen[55]);
-  const [blueOne, setBlueOne] = useState(pathBlue[56]);
-  const [blueTwo, setBlueTwo] = useState(pathBlue[56]);
-  const [blueThree, setBlueThree] = useState(pathBlue[56]);
-  // const [blueFour, setBlueFour] = useState(pathBlue[3]);
-  const [blueFour, setBlueFour] = useState(pathBlue[55]);
-  const [yellowOne, setYellowOne] = useState(pathYellow[56]);
-  const [yellowTwo, setYellowTwo] = useState(pathYellow[56]);
-  const [yellowThree, setYellowThree] = useState(pathYellow[56]);
-  const [yellowFour, setYellowFour] = useState(pathYellow[55]);
+  const [redOne, setRedOne] = useState(pathRedBase[0]);
+  const [redTwo, setRedTwo] = useState(pathRedBase[1]);
+  const [redThree, setRedThree] = useState(pathRedBase[2]);
+  const [redFour, setRedFour] = useState(pathRedBase[3]);
+  const [greenOne, setGreenOne] = useState(pathGreenBase[0]);
+  const [greenTwo, setGreenTwo] = useState(pathGreenBase[1]);
+  const [greenThree, setGreenThree] = useState(pathGreenBase[2]);
+  const [greenFour, setGreenFour] = useState(pathGreenBase[3]);
+  const [blueOne, setBlueOne] = useState(pathBlueBase[0]);
+  const [blueTwo, setBlueTwo] = useState(pathBlueBase[1]);
+  const [blueThree, setBlueThree] = useState(pathBlueBase[2]);
+  const [blueFour, setBlueFour] = useState(pathBlueBase[3]);
+  const [yellowOne, setYellowOne] = useState(pathYellowBase[0]);
+  const [yellowTwo, setYellowTwo] = useState(pathYellowBase[1]);
+  const [yellowThree, setYellowThree] = useState(pathYellowBase[2]);
+  const [yellowFour, setYellowFour] = useState(pathYellowBase[3]);
 
   const [currentPlayer, setCurrentPlayer] = useState<
     "red" | "green" | "yellow" | "blue"
@@ -725,7 +723,7 @@ export default function Home() {
 }
 // ✔️need to add killing logic ,
 // ✔️after kill can have one more turn
-// winning logic,
+// ✔️winning logic,
 // ✔️safe places logic where no one can kill ✔️ and
 // ✔️some UI improvements (mobile responsive ✔️)
 // like showing dice value on the dice button and
@@ -734,8 +732,9 @@ export default function Home() {
 //✔️ issues if 6 in dice and token is not in base it won't give a new turn, it just passes to other player
 //✔️issue pass button not working correctly
 //✔️pass button shows before the dice is rolled
-//add a home screen and a winner screen
+//add a home screen and 
+//✔️a winner screen
 //add sound eeffects for dice roll, token move, token kill and winning and conffetii
 // if got time add data to db.json
 //clean code and remove console logs and add comments to explain the code
-//if token at last index and other tokens are still usable then it should not give next player turn and wait for the player to choose another token to move
+//✔️if token at last index and other tokens are still usable then it should not give next player turn and wait for the player to choose another token to move
