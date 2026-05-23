@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Snackbar, { useSnackbar } from "./components/snackbar";
 
 const boardIds: string[] = [];
 for (let r = 0; r < 15; r++) {
@@ -275,9 +276,9 @@ export default function Home() {
   // Initial positions of tokens
   // const [redOne, setRedOne] = useState(pathRedBase[0]);
   const [redOne, setRedOne] = useState(pathRed[0]);
-  const [redTwo, setRedTwo] = useState(pathRedBase[1]);
-  const [redThree, setRedThree] = useState(pathRedBase[2]);
-  const [redFour, setRedFour] = useState(pathRedBase[3]);
+  const [redTwo, setRedTwo] = useState(pathRed[0]);
+  const [redThree, setRedThree] = useState(pathRed[0]);
+  const [redFour, setRedFour] = useState(pathRed[0]);
   const [greenOne, setGreenOne] = useState(pathGreenBase[0]);
   const [greenTwo, setGreenTwo] = useState(pathGreenBase[1]);
   const [greenThree, setGreenThree] = useState(pathGreenBase[2]);
@@ -302,6 +303,8 @@ export default function Home() {
   const [yellowAllBase, setYellowAllBase] = useState(false);
 
   const [diceValue, setDiceValue] = useState<number | null>(null);
+
+  const { messages, addMessage } = useSnackbar();
 
   const redTokens = [redOne, redTwo, redThree, redFour];
   const greenTokens = [greenOne, greenTwo, greenThree, greenFour];
@@ -423,7 +426,10 @@ export default function Home() {
           killed = true;
           // Opponent's token is on the same spot! Kill it and send back to base.
           opponent.setFns[idx](opponent.base[idx]);
-          console.log(`${opponentColor} token at index ${idx} killed!`);
+          addMessage(
+            `${opponentColor} token at index ${idx} killed!`,
+            currentColor,
+          );
         }
       });
     });
@@ -487,6 +493,7 @@ export default function Home() {
   return (
     <div className="flex flex-col flex-1 items-center justify-center font-sans dark:bg-black">
       <main className="flex flex-1 w-full flex-col items-center justify-center py-32 px-5 bg-white dark:bg-black sm:items-start">
+        <Snackbar messages={messages} />
         <div>
           <h1 className="text-3xl sm:text-6xl font-bold text-gray-900 dark:text-white">
             Ludo Game
@@ -515,25 +522,65 @@ export default function Home() {
                 <div
                   key={id}
                   id={id}
-                  onClick={() => {
-                    const { tokens, setFns, path } = players[currentPlayer];
-                    tokens.forEach((token, idx) => {
-                      if (token === id)
-                        moveToken(token, setFns[idx], path, currentPlayer);
-                    });
-                  }}
                   className={`relative flex items-center justify-center border border-transparent ${getCellColor(id)}`}
                 >
-                  {Object.entries(players).map(([player, { tokens, color }]) =>
-                    tokens.map((token) =>
-                      token === id ? (
+                  {(() => {
+                    // 1. Define a strict type for the array to fix the implicit 'any' error
+                    type TokenOnCell = {
+                      playerKey: keyof typeof players;
+                      tokenIdx: number;
+                    };
+
+                    const tokensOnCell: TokenOnCell[] = [];
+
+                    Object.entries(players).forEach(
+                      ([playerKey, { tokens }]) => {
+                        tokens.forEach((token, tokenIdx) => {
+                          if (token === id) {
+                            // 2. Assert the playerKey type to fix the indexing error
+                            tokensOnCell.push({
+                              playerKey: playerKey as keyof typeof players,
+                              tokenIdx,
+                            });
+                          }
+                        });
+                      },
+                    );
+
+                    return tokensOnCell.map((t, stackIdx) => {
+                      const player = players[t.playerKey]; // Now safe to index!
+                      const token = player.tokens[t.tokenIdx];
+                      const setFn = player.setFns[t.tokenIdx];
+                      const path = player.path;
+                      const color = player.color;
+
+                      const isCurrentPlayer = t.playerKey === currentPlayer;
+
+                      return (
                         <div
-                          key={`${player}-${token}`}
-                          className={`w-4/5 h-4/5 rounded-full shadow-lg border-2 border-white ${color}`}
+                          key={`${t.playerKey}-${t.tokenIdx}`}
+                          className={`w-4/5 h-4/5 rounded-full shadow-lg border-2 border-white ${color} ${
+                            isCurrentPlayer && diceValue !== null
+                              ? "cursor-pointer hover:opacity-80"
+                              : ""
+                          }`}
+                          style={{
+                            position: "absolute",
+                            top: "50%",
+                            left: `calc(50% - ${stackIdx * 7}px)`,
+                            transform: "translate(-50%, -50%)",
+                            zIndex: stackIdx,
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (isCurrentPlayer && diceValue !== null) {
+                              moveToken(token, setFn, path, t.playerKey);
+                            }
+                          }}
                         />
-                      ) : null,
-                    ),
-                  )}
+                      );
+                    });
+                  })()}
                 </div>
               );
             })}
@@ -553,8 +600,10 @@ export default function Home() {
               {(currentPlayer === "red" && redAllBase) ||
               (currentPlayer === "green" && greenAllBase) ||
               (currentPlayer === "blue" && blueAllBase) ||
-              (currentPlayer === "yellow" && yellowAllBase) &&
-              diceValue !== null && diceValue !== 6 ? (
+              (currentPlayer === "yellow" &&
+                yellowAllBase &&
+                diceValue !== null &&
+                diceValue !== 6) ? (
                 <button
                   onClick={() => passToNextPlayer(currentPlayer)}
                   className="px-4 py-2 sm:px-6 sm:py-3 ml-5 bg-yellow-500 text-white rounded-lg shadow-md"
