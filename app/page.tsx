@@ -505,10 +505,6 @@ export default function Home() {
     setCurrentPlayer("red");
     setDiceValue(null);
     setWinners([]);
-    setRedAllBase(false);
-    setGreenAllBase(false);
-    setBlueAllBase(false);
-    setYellowAllBase(false);
   };
 
   const isPlayerFinished = (color: "red" | "green" | "yellow" | "blue") => {
