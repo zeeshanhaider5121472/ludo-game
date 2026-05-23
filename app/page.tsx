@@ -480,8 +480,8 @@ export default function Home() {
     checkAllTokensInBase(currentPlayer);
   };
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
+    <div className="flex flex-col flex-1 items-center justify-center font-sans dark:bg-black">
+      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-8 bg-white dark:bg-black sm:items-start">
         <div>
           <h1 className="text-3xl sm:text-6xl font-bold text-gray-900 dark:text-white">
             Ludo Game
@@ -515,7 +515,7 @@ export default function Home() {
                         moveToken(token, setFns[idx], path, currentPlayer);
                     });
                   }}
-                  className={`relative flex items-center justify-center border border-gray-300 ${getCellColor(id)}`}
+                  className={`relative flex items-center justify-center border border-transparent ${getCellColor(id)}`}
                 >
                   {Object.entries(players).map(([player, { tokens, color }]) =>
                     tokens.map((token) =>
@@ -531,42 +531,42 @@ export default function Home() {
               );
             })}
           </div>
-        </div>
-        {/* Dice */}
-        <div className="mt-6 flex flex-col items-center gap-4">
-          <div className="flex flex-wrap justify-center gap-3">
-            <button
-              onClick={rollDice}
-              className="px-6 py-3 sm:px-6 sm:py-3 bg-blue-500 text-white rounded-lg shadow-md disabled:bg-blue-200"
-              disabled={diceValue !== null}
-            >
-              Roll Dice
-            </button>
-
-            {/* Conditionally render Pass button */}
-            {(currentPlayer === "red" && redAllBase) ||
-            (currentPlayer === "green" && greenAllBase) ||
-            (currentPlayer === "blue" && blueAllBase) ||
-            (currentPlayer === "yellow" && yellowAllBase) ? (
+          {/* Dice */}
+          <div className="mt-6 flex flex-col gap-4">
+            <div className="flex flex-wrap gap-3">
               <button
-                onClick={() => passToNextPlayer(currentPlayer)}
-                className="px-6 py-3 sm:px-6 sm:py-3 ml-5 bg-yellow-500 text-white rounded-lg shadow-md"
+                onClick={rollDice}
+                className="px-4 py-2 sm:px-6 sm:py-3 bg-blue-500 text-white rounded-lg shadow-md disabled:bg-blue-200"
+                disabled={diceValue !== null}
               >
-                Pass
+                Roll Dice
               </button>
-            ) : null}
 
-            {/* <button
+              {/* Conditionally render Pass button */}
+              {(currentPlayer === "red" && redAllBase) ||
+              (currentPlayer === "green" && greenAllBase) ||
+              (currentPlayer === "blue" && blueAllBase) ||
+              (currentPlayer === "yellow" && yellowAllBase) ? (
+                <button
+                  onClick={() => passToNextPlayer(currentPlayer)}
+                  className="px-4 py-2 sm:px-6 sm:py-3 ml-5 bg-yellow-500 text-white rounded-lg shadow-md"
+                >
+                  Pass
+                </button>
+              ) : null}
+
+              {/* <button
             onClick={() => checkAllTokensInBase(currentPlayer)}
             className="px-6 py-3 sm:px-6 sm:py-3 ml-5 bg-green-500 text-white rounded-lg shadow-md disabled:bg-blue-200"
           >
             Check All in Base
           </button> */}
-          </div>
+            </div>
 
-          {diceValue && (
-            <p className="mt-2 text-xl">Dice Rolled: {diceValue}</p>
-          )}
+            {diceValue && (
+              <p className="mt-2 text-xl">Dice Rolled: {diceValue}</p>
+            )}
+          </div>
         </div>
       </main>
     </div>
@@ -578,3 +578,4 @@ export default function Home() {
 //add a home screen and a winner screen
 //add sound eeffects for dice roll, token move, token kill and winning and conffetii
 // if got time add data to db.json
+//pass button shows before the dice is rolled
