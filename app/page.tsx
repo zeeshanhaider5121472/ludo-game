@@ -249,6 +249,7 @@ const pathBlueBase = ["10-1", "10-4", "13-1", "13-4"];
 const pathRedBase = ["1-1", "1-4", "4-1", "4-4"];
 const pathGreenBase = ["1-10", "1-13", "4-10", "4-13"];
 const pathYellowBase = ["10-10", "10-13", "13-10", "13-13"];
+const safeArea = ["6-1", "1-8", "8-13", "13-6"];
 const getCellColor = (id: string) => {
   const [r, c] = id.split("-").map(Number);
   // Bases
@@ -273,7 +274,7 @@ const getCellColor = (id: string) => {
 export default function Home() {
   // Initial positions of tokens
   // const [redOne, setRedOne] = useState(pathRedBase[0]);
-  const [redOne, setRedOne] = useState(pathRed[1]);
+  const [redOne, setRedOne] = useState(pathRed[0]);
   const [redTwo, setRedTwo] = useState(pathRedBase[1]);
   const [redThree, setRedThree] = useState(pathRedBase[2]);
   const [redFour, setRedFour] = useState(pathRedBase[3]);
@@ -285,7 +286,7 @@ export default function Home() {
   const [blueTwo, setBlueTwo] = useState(pathBlueBase[1]);
   const [blueThree, setBlueThree] = useState(pathBlueBase[2]);
   // const [blueFour, setBlueFour] = useState(pathBlueBase[3]);
-  const [blueFour, setBlueFour] = useState(pathBlue[15]);
+  const [blueFour, setBlueFour] = useState(pathBlue[12]);
   const [yellowOne, setYellowOne] = useState(pathYellowBase[0]);
   const [yellowTwo, setYellowTwo] = useState(pathYellowBase[1]);
   const [yellowThree, setYellowThree] = useState(pathYellowBase[2]);
@@ -410,7 +411,10 @@ export default function Home() {
     const opponentColors = (["red", "green", "yellow", "blue"] as const).filter(
       (c) => c !== currentColor,
     );
-
+    if (safeArea.includes(landingPosition)) {
+      console.log("Token in safe area, no kill");
+      return;
+    }
     opponentColors.forEach((opponentColor) => {
       const opponent = players[opponentColor];
       opponent.tokens.forEach((opponentTokenPos, idx) => {
@@ -442,7 +446,6 @@ export default function Home() {
     ) {
       console.log("got 6, moving out of base");
       setToken(path[0]);
-      checkAndKill(path[0], color);
       setDiceValue(null);
       return;
     }
@@ -471,7 +474,8 @@ export default function Home() {
   };
 
   const rollDice = () => {
-    let roll = 2;
+    // let roll = 1;
+    const roll = Math.floor(Math.random() * 6) + 1;
     setDiceValue(roll);
     checkAllTokensInBase(currentPlayer);
   };
@@ -568,9 +572,9 @@ export default function Home() {
     </div>
   );
 }
-// need to add killing logic, winning logic,safe places logic where no one can kill and some UI improvements (mobile responsive) like showing dice value on the dice button and highlighting current player's tokens and changing color of the current player to the current player
-//issues if 6 in dice and token is not in base it won't give a new turn, it just passes to other player
-//issue pass button not working
+// need to add killing logic ✔️, winning logic,safe places logic where no one can kill ✔️ and some UI improvements (mobile responsive ✔️) like showing dice value on the dice button and highlighting current player's tokens and changing color of the current player to the current player
+//✔️ issues if 6 in dice and token is not in base it won't give a new turn, it just passes to other player
+//issue pass button not working correctly
 //add a home screen and a winner screen
 //add sound eeffects for dice roll, token move, token kill and winning and conffetii
 // if got time add data to db.json
