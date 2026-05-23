@@ -10,7 +10,7 @@ for (let r = 0; r < 15; r++) {
   }
 }
 
-//red token path
+// Token paths
 const pathRed = [
   "6-1",
   "6-2",
@@ -70,7 +70,6 @@ const pathRed = [
   "7-5",
   "7-6",
 ];
-//Green token path
 const pathGreen = [
   "1-8",
   "2-8",
@@ -130,7 +129,6 @@ const pathGreen = [
   "5-7",
   "6-7",
 ];
-//Blue token path
 const pathBlue = [
   "13-6",
   "12-6",
@@ -190,7 +188,6 @@ const pathBlue = [
   "9-7",
   "8-7",
 ];
-//Yellow token path
 const pathYellow = [
   "8-13",
   "8-12",
@@ -250,14 +247,16 @@ const pathYellow = [
   "7-9",
   "7-8",
 ];
+
+// Bases and Safe Areas
 const pathBlueBase = ["10-1", "10-4", "13-1", "13-4"];
 const pathRedBase = ["1-1", "1-4", "4-1", "4-4"];
 const pathGreenBase = ["1-10", "1-13", "4-10", "4-13"];
 const pathYellowBase = ["10-10", "10-13", "13-10", "13-13"];
 const safeArea = ["6-1", "1-8", "8-13", "13-6"];
+
 const getCellColor = (id: string) => {
   const [r, c] = id.split("-").map(Number);
-  // Bases
   if (r <= 5 && c <= 5) return "bg-red-200";
   if (r === 7 && c >= 1 && c <= 5) return "bg-red-200";
   if (r === 6 && c === 1) return "bg-red-200";
@@ -270,14 +269,11 @@ const getCellColor = (id: string) => {
   if (r >= 9 && c <= 5) return "bg-blue-200";
   if (r >= 9 && r <= 13 && c === 7) return "bg-blue-200";
   if (r === 13 && c === 6) return "bg-blue-200";
-  // Center
   if (r >= 6 && r <= 8 && c >= 6 && c <= 8) return "bg-gray-400";
-  // Path
   return "bg-white";
 };
 
 export default function Home() {
-  // Initial positions of tokens
   const [redOne, setRedOne] = useState(pathRedBase[0]);
   const [redTwo, setRedTwo] = useState(pathRedBase[1]);
   const [redThree, setRedThree] = useState(pathRedBase[2]);
@@ -298,9 +294,7 @@ export default function Home() {
   const [currentPlayer, setCurrentPlayer] = useState<
     "red" | "green" | "yellow" | "blue"
   >("red");
-
   const [diceValue, setDiceValue] = useState<number | null>(null);
-
   const { messages, addMessage } = useSnackbar();
   const [winners, setWinners] = useState<string[]>([]);
 
@@ -308,6 +302,7 @@ export default function Home() {
   const greenTokens = [greenOne, greenTwo, greenThree, greenFour];
   const blueTokens = [blueOne, blueTwo, blueThree, blueFour];
   const yellowTokens = [yellowOne, yellowTwo, yellowThree, yellowFour];
+
   const players = {
     red: {
       tokens: redTokens,
@@ -339,27 +334,37 @@ export default function Home() {
     },
   };
 
-  const checkAllTokensInBase = (color: "red" | "green" | "yellow" | "blue") => {
+  const isPlayerFinished = (color: "red" | "green" | "yellow" | "blue") => {
     const player = players[color];
-    const allInBase = player.tokens.every((token) =>
-      player.base.includes(token),
-    );
+    const lastPosition = player.path[player.path.length - 1];
+    return player.tokens.every((token) => token === lastPosition);
+  };
 
-    // Update the specific state variable
-    // if (color === "red") setRedAllBase(allInBase);
-    // else if (color === "green") setGreenAllBase(allInBase);
-    // else if (color === "blue") setBlueAllBase(allInBase);
-    // else if (color === "yellow") setYellowAllBase(allInBase);
+  const hasValidMove = (color: "red" | "green" | "yellow" | "blue") => {
+    if (diceValue === null) return true;
+    const player = players[color];
+    const lastPosition = player.path[player.path.length - 1];
 
-    return allInBase;
+    for (let i = 0; i < 4; i++) {
+      const tokenPos = player.tokens[i];
+      const isInBase = player.base.includes(tokenPos);
+      const isFinished = tokenPos === lastPosition;
+      const isOnPath = player.path.includes(tokenPos) && !isFinished;
+
+      if (isInBase && diceValue === 6) return true;
+      if (isOnPath) {
+        const currentIndex = player.path.indexOf(tokenPos);
+        if (currentIndex + diceValue < player.path.length) return true;
+      }
+    }
+    return false;
   };
 
   const passToNextPlayer = (
     color: "red" | "green" | "yellow" | "blue",
     depth = 0,
   ) => {
-    if (depth >= 4) return; // Safety check: stop if all players are finished
-
+    if (depth >= 4) return;
     const order: Array<"red" | "green" | "yellow" | "blue"> = [
       "red",
       "green",
@@ -370,7 +375,6 @@ export default function Home() {
     const nextColor = order[(currentIndex + 1) % 4];
 
     if (isPlayerFinished(nextColor)) {
-      // Skip the finished player and pass to the next one
       passToNextPlayer(nextColor, depth + 1);
     } else {
       setCurrentPlayer(nextColor);
@@ -385,17 +389,14 @@ export default function Home() {
     const opponentColors = (["red", "green", "yellow", "blue"] as const).filter(
       (c) => c !== currentColor,
     );
-    if (safeArea.includes(landingPosition)) {
-      console.log("Token in safe area, no kill");
-      return false;
-    }
+    if (safeArea.includes(landingPosition)) return false;
+
     let killed = false;
     opponentColors.forEach((opponentColor) => {
       const opponent = players[opponentColor];
       opponent.tokens.forEach((opponentTokenPos, idx) => {
         if (opponentTokenPos === landingPosition) {
           killed = true;
-          // Opponent's token is on the same spot! Kill it and send back to base.
           opponent.setFns[idx](opponent.base[idx]);
           addMessage(
             `${opponentColor} token at index ${idx} killed!`,
@@ -415,49 +416,32 @@ export default function Home() {
   ) => {
     if (!diceValue) return;
 
-    const isInBase =
-      pathRedBase.includes(token) ||
-      pathGreenBase.includes(token) ||
-      pathBlueBase.includes(token) ||
-      pathYellowBase.includes(token);
+    const isInBase = players[color].base.includes(token);
     const isOnPath = path.includes(token) && !isInBase;
 
-    // 1. Check if the clicked token is valid for the current dice roll
-    if (isInBase && diceValue !== 6) return; // Can't leave base without a 6
+    if (isInBase && diceValue !== 6) return;
     if (isOnPath) {
       const currentIndex = path.indexOf(token);
       const newIndex = currentIndex + diceValue;
-      if (newIndex >= path.length) return; // Overshooting, invalid move
-    } else {
-      return; // Token is already finished, can't move
+      if (newIndex >= path.length) return;
+    } else if (!isInBase) {
+      return;
     }
 
-    // 2. If we reach here, the move is VALID. Proceed with the move.
+    // Execute valid move
     let hasKilled = false;
 
     if (isInBase && diceValue === 6) {
-      addMessage("got 6, moving out of base", currentPlayer);
+      addMessage("Got a 6, moving out of base!", currentPlayer);
       setToken(path[0]);
       hasKilled = checkAndKill(path[0], color);
-
-      // Win check for leaving base (theoretically impossible, but good for safety)
-      const lastPosition = path[path.length - 1];
-      if (path[0] === lastPosition) {
-        const tokensAlreadyAtEnd = players[color].tokens.filter(
-          (t) => t === lastPosition,
-        ).length;
-        if (tokensAlreadyAtEnd + 1 === 4 && !winners.includes(color)) {
-          setWinners((prev) => [...prev, color]);
-        }
-      }
     } else if (isOnPath) {
       const currentIndex = path.indexOf(token);
       const newIndex = currentIndex + diceValue;
-
       setToken(path[newIndex]);
       hasKilled = checkAndKill(path[newIndex], color);
 
-      // Win check for normal move
+      // Win check
       const lastPosition = path[path.length - 1];
       if (path[newIndex] === lastPosition) {
         const tokensAlreadyAtEnd = players[color].tokens.filter(
@@ -465,98 +449,57 @@ export default function Home() {
         ).length;
         if (tokensAlreadyAtEnd + 1 === 4 && !winners.includes(color)) {
           setWinners((prev) => [...prev, color]);
+          addMessage(`${color} player finished! 🎉`, currentPlayer);
         }
       }
     }
 
-    // 3. Handle turn passing
+    // Handle turn passing
     if (diceValue !== 6 && !hasKilled) {
-      console.log("No kill and not a 6, passing to next player");
       passToNextPlayer(color);
     }
 
-    // Reset dice after move
     setDiceValue(null);
   };
 
   const resetGame = () => {
-    // Reset all tokens back to their default starting bases
     setRedOne(pathRedBase[0]);
     setRedTwo(pathRedBase[1]);
     setRedThree(pathRedBase[2]);
     setRedFour(pathRedBase[3]);
-
     setGreenOne(pathGreenBase[0]);
     setGreenTwo(pathGreenBase[1]);
     setGreenThree(pathGreenBase[2]);
     setGreenFour(pathGreenBase[3]);
-
     setBlueOne(pathBlueBase[0]);
     setBlueTwo(pathBlueBase[1]);
     setBlueThree(pathBlueBase[2]);
     setBlueFour(pathBlueBase[3]);
-
     setYellowOne(pathYellowBase[0]);
     setYellowTwo(pathYellowBase[1]);
     setYellowThree(pathYellowBase[2]);
     setYellowFour(pathYellowBase[3]);
-
-    // Reset game states
     setCurrentPlayer("red");
     setDiceValue(null);
     setWinners([]);
   };
 
-  const isPlayerFinished = (color: "red" | "green" | "yellow" | "blue") => {
-    const player = players[color];
-    const lastPosition = player.path[player.path.length - 1];
-    return player.tokens.every((token) => token === lastPosition);
-  };
-
-  const hasValidMove = (color: "red" | "green" | "yellow" | "blue") => {
-    if (diceValue === null) return true; // Haven't rolled yet
-    const player = players[color];
-    const lastPosition = player.path[player.path.length - 1];
-
-    for (let i = 0; i < 4; i++) {
-      const tokenPos = player.tokens[i];
-      const isInBase = player.base.includes(tokenPos);
-      const isFinished = tokenPos === lastPosition;
-      const isOnPath = player.path.includes(tokenPos) && !isFinished;
-
-      // Can move out of base with a 6
-      if (isInBase && diceValue === 6) return true;
-
-      // Can move on the path without overshooting the end
-      if (isOnPath) {
-        const currentIndex = player.path.indexOf(tokenPos);
-        if (currentIndex + diceValue < player.path.length) return true;
-      }
-    }
-    return false; // No valid moves found
-  };
-
   const rollDice = () => {
     const audio = new Audio("/soundeffects/shakedice.mp3");
-    audio.play().catch((e) => console.log("Audio blocked by browser"));
-    // let roll = 1;
+    audio.play().catch((e) => console.log("Audio blocked"));
     const roll = Math.floor(Math.random() * 6) + 1;
     setDiceValue(roll);
-    checkAllTokensInBase(currentPlayer);
   };
+
   return (
     <div className="flex flex-col flex-1 items-center justify-center font-sans dark:bg-black">
-      <main className="flex flex-1 w-full flex-col items-center justify-center py-32 px-5 bg-white dark:bg-black sm:items-start">
-        <div>
+      <main className="flex flex-1 w-full flex-col items-center justify-center py-8 px-4 sm:py-32 sm:px-16 bg-white dark:bg-black">
+        <div className="w-full flex flex-col items-center">
           <h1 className="text-3xl sm:text-6xl font-bold text-gray-900 dark:text-white">
             Ludo Game
           </h1>
-
-          <p className="mt-3 text-base sm:text-2xl text-gray-600 dark:text-gray-300">
-            A simple Ludo game built with Next.js and Tailwind CSS.
-          </p>
           <p
-            className={`mt-3 text-lg sm:text-xl ${currentPlayer === "red" ? "text-red-500" : currentPlayer === "green" ? "text-green-500" : currentPlayer === "blue" ? "text-blue-500" : "text-yellow-500"} dark:text-gray-300`}
+            className={`mt-3 text-lg sm:text-xl font-semibold ${currentPlayer === "red" ? "text-red-500" : currentPlayer === "green" ? "text-green-500" : currentPlayer === "blue" ? "text-blue-500" : "text-yellow-500"} dark:text-gray-300`}
           >
             Current Player:{" "}
             {currentPlayer === "red"
@@ -568,8 +511,8 @@ export default function Home() {
                   : "Yellow"}
           </p>
 
-          {/* Game Board and Players */}
-          <div className="grid grid-cols-15 grid-rows-15 w-full aspect-square border-4 border-gray-800 gap-px bg-gray-800">
+          {/* Game Board */}
+          <div className="grid grid-cols-15 grid-rows-15 w-full max-w-150 aspect-square border-4 border-gray-800 gap-px bg-gray-800 mt-6">
             {boardIds.map((id) => {
               return (
                 <div
@@ -578,19 +521,16 @@ export default function Home() {
                   className={`relative flex items-center justify-center border border-transparent ${getCellColor(id)}`}
                 >
                   {(() => {
-                    // 1. Define a strict type for the array to fix the implicit 'any' error
                     type TokenOnCell = {
                       playerKey: keyof typeof players;
                       tokenIdx: number;
                     };
-
                     const tokensOnCell: TokenOnCell[] = [];
 
                     Object.entries(players).forEach(
                       ([playerKey, { tokens }]) => {
                         tokens.forEach((token, tokenIdx) => {
                           if (token === id) {
-                            // 2. Assert the playerKey type to fix the indexing error
                             tokensOnCell.push({
                               playerKey: playerKey as keyof typeof players,
                               tokenIdx,
@@ -601,12 +541,11 @@ export default function Home() {
                     );
 
                     return tokensOnCell.map((t, stackIdx) => {
-                      const player = players[t.playerKey]; // Now safe to index!
+                      const player = players[t.playerKey];
                       const token = player.tokens[t.tokenIdx];
                       const setFn = player.setFns[t.tokenIdx];
                       const path = player.path;
                       const color = player.color;
-
                       const isCurrentPlayer = t.playerKey === currentPlayer;
 
                       return (
@@ -638,37 +577,32 @@ export default function Home() {
               );
             })}
           </div>
-          {/* Dice */}
-          <div className="mt-6 flex flex-col gap-4">
-            <div className="flex flex-wrap gap-3">
+
+          {/* Controls */}
+          <div className="mt-6 flex flex-col items-center gap-4">
+            <div className="flex flex-wrap justify-center gap-3">
               <button
                 onClick={rollDice}
-                className="px-4 py-2 sm:px-6 sm:py-3 bg-blue-500 text-white rounded-lg shadow-md disabled:bg-blue-200"
+                className={`px-4 py-2 sm:px-6 sm:py-3 ${players[currentPlayer].color} text-white font-semibold rounded-lg cursor-pointer shadow-md disabled:opacity-50 disabled:cursor-not-allowed`}
                 disabled={diceValue !== null}
               >
                 Roll Dice
               </button>
 
-              {/* Conditionally render Pass button */}
               {diceValue !== null && !hasValidMove(currentPlayer) ? (
                 <button
                   onClick={() => passToNextPlayer(currentPlayer)}
-                  className="px-4 py-2 sm:px-6 sm:py-3 ml-5 bg-yellow-500 text-white rounded-lg shadow-md"
+                  className="px-4 py-2 sm:px-6 sm:py-3 bg-yellow-500 text-white cursor-pointer font-semibold rounded-lg shadow-md"
                 >
                   Pass
                 </button>
               ) : null}
-
-              {/* <button
-            onClick={() => checkAllTokensInBase(currentPlayer)}
-            className="px-6 py-3 sm:px-6 sm:py-3 ml-5 bg-green-500 text-white rounded-lg shadow-md disabled:bg-blue-200"
-          >
-            Check All in Base
-          </button> */}
             </div>
 
             {diceValue && (
-              <p className="mt-2 text-xl">Dice Rolled: {diceValue}</p>
+              <p className="text-xl font-bold text-gray-800 dark:text-gray-200">
+                Dice Rolled: {diceValue}
+              </p>
             )}
           </div>
         </div>
@@ -678,6 +612,7 @@ export default function Home() {
     </div>
   );
 }
+
 // ✔️need to add killing logic ,
 // ✔️after kill can have one more turn
 // ✔️winning logic,
