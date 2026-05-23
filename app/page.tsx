@@ -481,7 +481,7 @@ export default function Home() {
   };
   return (
     <div className="flex flex-col flex-1 items-center justify-center font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-8 bg-white dark:bg-black sm:items-start">
+      <main className="flex flex-1 w-full flex-col items-center justify-center py-32 px-5 bg-white dark:bg-black sm:items-start">
         <div>
           <h1 className="text-3xl sm:text-6xl font-bold text-gray-900 dark:text-white">
             Ludo Game
@@ -502,7 +502,7 @@ export default function Home() {
           </p>
 
           {/* Game Board and Players */}
-          <div className="grid grid-cols-15 grid-rows-15 w-full max-w-150 aspect-square border-4 border-gray-800 gap-px bg-gray-800">
+          <div className="grid grid-cols-15 grid-rows-15 w-full aspect-square border-4 border-gray-800 gap-px bg-gray-800">
             {boardIds.map((id) => {
               return (
                 <div
@@ -579,3 +579,4 @@ export default function Home() {
 //add sound eeffects for dice roll, token move, token kill and winning and conffetii
 // if got time add data to db.json
 //pass button shows before the dice is rolled
+//after kill can have one more turn
