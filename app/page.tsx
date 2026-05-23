@@ -286,7 +286,7 @@ export default function Home() {
   const [blueTwo, setBlueTwo] = useState(pathBlueBase[1]);
   const [blueThree, setBlueThree] = useState(pathBlueBase[2]);
   // const [blueFour, setBlueFour] = useState(pathBlueBase[3]);
-  const [blueFour, setBlueFour] = useState(pathBlue[12]);
+  const [blueFour, setBlueFour] = useState(pathBlue[14]);
   const [yellowOne, setYellowOne] = useState(pathYellowBase[0]);
   const [yellowTwo, setYellowTwo] = useState(pathYellowBase[1]);
   const [yellowThree, setYellowThree] = useState(pathYellowBase[2]);
@@ -407,24 +407,27 @@ export default function Home() {
   const checkAndKill = (
     landingPosition: string,
     currentColor: "red" | "green" | "yellow" | "blue",
-  ) => {
+  ): boolean => {
     const opponentColors = (["red", "green", "yellow", "blue"] as const).filter(
       (c) => c !== currentColor,
     );
     if (safeArea.includes(landingPosition)) {
       console.log("Token in safe area, no kill");
-      return;
+      return false;
     }
+    let killed = false;
     opponentColors.forEach((opponentColor) => {
       const opponent = players[opponentColor];
       opponent.tokens.forEach((opponentTokenPos, idx) => {
         if (opponentTokenPos === landingPosition) {
+          killed = true;
           // Opponent's token is on the same spot! Kill it and send back to base.
           opponent.setFns[idx](opponent.base[idx]);
           console.log(`${opponentColor} token at index ${idx} killed!`);
         }
       });
     });
+    return killed;
   };
 
   const moveToken = (
@@ -446,6 +449,11 @@ export default function Home() {
     ) {
       console.log("got 6, moving out of base");
       setToken(path[0]);
+      // Check kill on initial spawn position too!
+      const hasKilled = checkAndKill(path[0], color);
+      if (diceValue !== 6 && !hasKilled) {
+        passToNextPlayer(color);
+      }
       setDiceValue(null);
       return;
     }
@@ -454,28 +462,25 @@ export default function Home() {
     const currentIndex = path.indexOf(token);
     const newIndex = currentIndex + diceValue;
 
+    let hasKilled = false;
     if (newIndex < path.length) {
       setToken(path[newIndex]);
-      checkAndKill(path[newIndex], color);
+      hasKilled = checkAndKill(path[newIndex], color);
     }
-    diceValue != 6 &&
-      setCurrentPlayer((prev) =>
-        prev === "red"
-          ? "green"
-          : prev === "green"
-            ? "yellow"
-            : prev === "yellow"
-              ? "blue"
-              : "red",
-      );
+
+    // If not a 6 and didn't kill anyone, pass the turn
+    if (diceValue !== 6 && !hasKilled) {
+      console.log("No kill and not a 6, passing to next player");
+      passToNextPlayer(color);
+    }
 
     // Reset dice after move
     setDiceValue(null);
   };
 
   const rollDice = () => {
-    // let roll = 1;
-    const roll = Math.floor(Math.random() * 6) + 1;
+    let roll = 1;
+    // const roll = Math.floor(Math.random() * 6) + 1;
     setDiceValue(roll);
     checkAllTokensInBase(currentPlayer);
   };
@@ -490,7 +495,9 @@ export default function Home() {
           <p className="mt-3 text-base sm:text-2xl text-gray-600 dark:text-gray-300">
             A simple Ludo game built with Next.js and Tailwind CSS.
           </p>
-          <p className="mt-3 text-lg sm:text-xl text-purple-500 dark:text-gray-300">
+          <p
+            className={`mt-3 text-lg sm:text-xl ${currentPlayer === "red" ? "text-red-500" : currentPlayer === "green" ? "text-green-500" : currentPlayer === "blue" ? "text-blue-500" : "text-yellow-500"} dark:text-gray-300`}
+          >
             Current Player:{" "}
             {currentPlayer === "red"
               ? "Red"
@@ -572,11 +579,18 @@ export default function Home() {
     </div>
   );
 }
-// need to add killing logic ✔️, winning logic,safe places logic where no one can kill ✔️ and some UI improvements (mobile responsive ✔️) like showing dice value on the dice button and highlighting current player's tokens and changing color of the current player to the current player
+// ✔️need to add killing logic ,
+// ✔️after kill can have one more turn
+// winning logic,
+// ✔️safe places logic where no one can kill ✔️ and
+// ✔️some UI improvements (mobile responsive ✔️)
+// like showing dice value on the dice button and
+// highlighting current player's tokens and
+// changing color of the current player to the current player
 //✔️ issues if 6 in dice and token is not in base it won't give a new turn, it just passes to other player
 //issue pass button not working correctly
+//pass button shows before the dice is rolled
 //add a home screen and a winner screen
 //add sound eeffects for dice roll, token move, token kill and winning and conffetii
 // if got time add data to db.json
-//pass button shows before the dice is rolled
-//after kill can have one more turn
+//clean code and remove console logs and add comments to explain the code
