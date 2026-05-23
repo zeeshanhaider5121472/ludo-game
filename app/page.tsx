@@ -553,7 +553,8 @@ export default function Home() {
               {(currentPlayer === "red" && redAllBase) ||
               (currentPlayer === "green" && greenAllBase) ||
               (currentPlayer === "blue" && blueAllBase) ||
-              (currentPlayer === "yellow" && yellowAllBase) ? (
+              (currentPlayer === "yellow" && yellowAllBase) &&
+              diceValue !== null && diceValue !== 6 ? (
                 <button
                   onClick={() => passToNextPlayer(currentPlayer)}
                   className="px-4 py-2 sm:px-6 sm:py-3 ml-5 bg-yellow-500 text-white rounded-lg shadow-md"
@@ -586,10 +587,10 @@ export default function Home() {
 // ✔️some UI improvements (mobile responsive ✔️)
 // like showing dice value on the dice button and
 // highlighting current player's tokens and
-// changing color of the current player to the current player
+//✔️ changing color of the current player to the current player
 //✔️ issues if 6 in dice and token is not in base it won't give a new turn, it just passes to other player
-//issue pass button not working correctly
-//pass button shows before the dice is rolled
+//✔️issue pass button not working correctly
+//✔️pass button shows before the dice is rolled
 //add a home screen and a winner screen
 //add sound eeffects for dice roll, token move, token kill and winning and conffetii
 // if got time add data to db.json
