@@ -312,24 +312,28 @@ export default function Home() {
       setFns: [setRedOne, setRedTwo, setRedThree, setRedFour],
       path: pathRed,
       color: "bg-red-500",
+      base: pathRedBase,
     },
     green: {
       tokens: greenTokens,
       setFns: [setGreenOne, setGreenTwo, setGreenThree, setGreenFour],
       path: pathGreen,
       color: "bg-green-500",
+      base: pathGreenBase,
     },
     blue: {
       tokens: blueTokens,
       setFns: [setBlueOne, setBlueTwo, setBlueThree, setBlueFour],
       path: pathBlue,
       color: "bg-blue-500",
+      base: pathBlueBase,
     },
     yellow: {
       tokens: yellowTokens,
       setFns: [setYellowOne, setYellowTwo, setYellowThree, setYellowFour],
       path: pathYellow,
       color: "bg-yellow-500",
+      base: pathYellowBase,
     },
   };
 
@@ -399,10 +403,31 @@ export default function Home() {
     setDiceValue(null);
   };
 
+  const checkAndKill = (
+    landingPosition: string,
+    currentColor: "red" | "green" | "yellow" | "blue",
+  ) => {
+    const opponentColors = (["red", "green", "yellow", "blue"] as const).filter(
+      (c) => c !== currentColor,
+    );
+
+    opponentColors.forEach((opponentColor) => {
+      const opponent = players[opponentColor];
+      opponent.tokens.forEach((opponentTokenPos, idx) => {
+        if (opponentTokenPos === landingPosition) {
+          // Opponent's token is on the same spot! Kill it and send back to base.
+          opponent.setFns[idx](opponent.base[idx]);
+          console.log(`${opponentColor} token at index ${idx} killed!`);
+        }
+      });
+    });
+  };
+
   const moveToken = (
     token: string,
     setToken: (val: string) => void,
     path: string[],
+    color: "red" | "green" | "yellow" | "blue",
   ) => {
     if (!diceValue) return;
     if (!path.includes(token) && diceValue !== 6) {
@@ -417,6 +442,7 @@ export default function Home() {
     ) {
       console.log("got 6, moving out of base");
       setToken(path[0]);
+      checkAndKill(path[0], color);
       setDiceValue(null);
       return;
     }
@@ -427,6 +453,7 @@ export default function Home() {
 
     if (newIndex < path.length) {
       setToken(path[newIndex]);
+      checkAndKill(path[newIndex], color);
     }
     diceValue != 6 &&
       setCurrentPlayer((prev) =>
@@ -444,14 +471,9 @@ export default function Home() {
   };
 
   const rollDice = () => {
-    const roll = Math.floor(Math.random() * 6) + 1;
-    // let roll = 2;
+    let roll = 2;
     setDiceValue(roll);
     checkAllTokensInBase(currentPlayer);
-    // Switch turn after rolling
-    // roll != 6
-    //   ? setCurrentPlayer((prev) => (prev === "red" ? "green" : "red"))
-    //   : null;
   };
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -485,7 +507,8 @@ export default function Home() {
                   onClick={() => {
                     const { tokens, setFns, path } = players[currentPlayer];
                     tokens.forEach((token, idx) => {
-                      if (token === id) moveToken(token, setFns[idx], path);
+                      if (token === id)
+                        moveToken(token, setFns[idx], path, currentPlayer);
                     });
                   }}
                   className={`relative flex items-center justify-center border border-gray-300 ${getCellColor(id)}`}
@@ -528,12 +551,12 @@ export default function Home() {
             </button>
           ) : null}
 
-          <button
+          {/* <button
             onClick={() => checkAllTokensInBase(currentPlayer)}
             className="px-6 py-3 ml-5 bg-green-500 text-white rounded-lg shadow-md disabled:bg-blue-200"
           >
             Check All in Base
-          </button>
+          </button> */}
 
           {diceValue && (
             <p className="mt-2 text-xl">Dice Rolled: {diceValue}</p>
@@ -543,7 +566,9 @@ export default function Home() {
     </div>
   );
 }
-// need to add killing logic, winning logic, and some UI improvements like showing dice value on the dice button and highlighting current player's tokens and changing color of the current player to the current player
+// need to add killing logic, winning logic,safe places logic where no one can kill and some UI improvements (mobile responsive) like showing dice value on the dice button and highlighting current player's tokens and changing color of the current player to the current player
 //issues if 6 in dice and token is not in base it won't give a new turn, it just passes to other player
 //issue pass button not working
 //add a home screen and a winner screen
+//add sound eeffects for dice roll, token move, token kill and winning and conffetii
+// if got time add data to db.json
