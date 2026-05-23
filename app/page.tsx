@@ -70,6 +70,7 @@ const pathRed = [
   "7-5",
   "7-6",
 ];
+//Green token path
 const pathGreen = [
   "1-8",
   "2-8",
@@ -129,6 +130,7 @@ const pathGreen = [
   "5-7",
   "6-7",
 ];
+//Blue token path
 const pathBlue = [
   "13-6",
   "12-6",
@@ -188,6 +190,7 @@ const pathBlue = [
   "9-7",
   "8-7",
 ];
+//Yellow token path
 const pathYellow = [
   "8-13",
   "8-12",
@@ -296,11 +299,6 @@ export default function Home() {
     "red" | "green" | "yellow" | "blue"
   >("red");
 
-  const [redAllBase, setRedAllBase] = useState(false);
-  const [greenAllBase, setGreenAllBase] = useState(false);
-  const [blueAllBase, setBlueAllBase] = useState(false);
-  const [yellowAllBase, setYellowAllBase] = useState(false);
-
   const [diceValue, setDiceValue] = useState<number | null>(null);
 
   const { messages, addMessage } = useSnackbar();
@@ -342,55 +340,18 @@ export default function Home() {
   };
 
   const checkAllTokensInBase = (color: "red" | "green" | "yellow" | "blue") => {
-    if (color === "red") {
-      const allInBase = [redOne, redTwo, redThree, redFour].every((e) =>
-        pathRedBase.includes(e),
-      );
-      if (allInBase) {
-        console.log("Red tokens in base");
-        setRedAllBase(true);
-      } else {
-        console.log("Red tokens not in base");
-        setRedAllBase(false);
-      }
-      return allInBase;
-    } else if (color === "green") {
-      const allInBase = [greenOne, greenTwo, greenThree, greenFour].every((e) =>
-        pathGreenBase.includes(e),
-      );
-      if (allInBase) {
-        console.log("Green tokens in base");
-        setGreenAllBase(true);
-      } else {
-        console.log("Green tokens not in base");
-        setGreenAllBase(false);
-      }
-      return allInBase;
-    } else if (color === "blue") {
-      const allInBase = [blueOne, blueTwo, blueThree, blueFour].every((e) =>
-        pathBlueBase.includes(e),
-      );
-      if (allInBase) {
-        console.log("Blue tokens in base");
-        setBlueAllBase(true);
-      } else {
-        console.log("Blue tokens not in base");
-        setBlueAllBase(false);
-      }
-      return allInBase;
-    } else if (color === "yellow") {
-      const allInBase = [yellowOne, yellowTwo, yellowThree, yellowFour].every(
-        (e) => pathYellowBase.includes(e),
-      );
-      if (allInBase) {
-        console.log("Yellow tokens in base");
-        setYellowAllBase(true);
-      } else {
-        console.log("Yellow tokens not in base");
-        setYellowAllBase(false);
-      }
-      return allInBase;
-    }
+    const player = players[color];
+    const allInBase = player.tokens.every((token) =>
+      player.base.includes(token),
+    );
+
+    // Update the specific state variable
+    // if (color === "red") setRedAllBase(allInBase);
+    // else if (color === "green") setGreenAllBase(allInBase);
+    // else if (color === "blue") setBlueAllBase(allInBase);
+    // else if (color === "yellow") setYellowAllBase(allInBase);
+
+    return allInBase;
   };
 
   const passToNextPlayer = (
@@ -463,12 +424,10 @@ export default function Home() {
 
     // 1. Check if the clicked token is valid for the current dice roll
     if (isInBase && diceValue !== 6) return; // Can't leave base without a 6
-    if (isOnPath && diceValue === 6) {
-      // Valid move out of base, continue below
-    } else if (isOnPath) {
+    if (isOnPath) {
       const currentIndex = path.indexOf(token);
       const newIndex = currentIndex + diceValue;
-      if (newIndex >= path.length) return; // Overshooting the finish line, invalid move! Do nothing.
+      if (newIndex >= path.length) return; // Overshooting, invalid move
     } else {
       return; // Token is already finished, can't move
     }
@@ -582,8 +541,10 @@ export default function Home() {
   };
 
   const rollDice = () => {
-    let roll = 1;
-    // const roll = Math.floor(Math.random() * 6) + 1;
+    const audio = new Audio("/soundeffects/shakedice.mp3");
+    audio.play().catch((e) => console.log("Audio blocked by browser"));
+    // let roll = 1;
+    const roll = Math.floor(Math.random() * 6) + 1;
     setDiceValue(roll);
     checkAllTokensInBase(currentPlayer);
   };
@@ -732,7 +693,7 @@ export default function Home() {
 //✔️ issues if 6 in dice and token is not in base it won't give a new turn, it just passes to other player
 //✔️issue pass button not working correctly
 //✔️pass button shows before the dice is rolled
-//add a home screen and 
+//add a home screen and
 //✔️a winner screen
 //add sound eeffects for dice roll, token move, token kill and winning and conffetii
 // if got time add data to db.json
