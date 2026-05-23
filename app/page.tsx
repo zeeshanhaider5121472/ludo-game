@@ -479,14 +479,14 @@ export default function Home() {
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
         <div>
-          <h1 className="text-6xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl sm:text-6xl font-bold text-gray-900 dark:text-white">
             Ludo Game
           </h1>
 
-          <p className="mt-3 text-2xl text-gray-600 dark:text-gray-300">
+          <p className="mt-3 text-base sm:text-2xl text-gray-600 dark:text-gray-300">
             A simple Ludo game built with Next.js and Tailwind CSS.
           </p>
-          <p className="mt-3 text-xl text-purple-500 dark:text-gray-300">
+          <p className="mt-3 text-lg sm:text-xl text-purple-500 dark:text-gray-300">
             Current Player:{" "}
             {currentPlayer === "red"
               ? "Red"
@@ -498,7 +498,7 @@ export default function Home() {
           </p>
 
           {/* Game Board and Players */}
-          <div className="grid grid-cols-15 grid-rows-15 w-150 h-150 border-4 border-gray-800 gap-px bg-gray-800">
+          <div className="grid grid-cols-15 grid-rows-15 w-full max-w-150 aspect-square border-4 border-gray-800 gap-px bg-gray-800">
             {boardIds.map((id) => {
               return (
                 <div
@@ -518,7 +518,7 @@ export default function Home() {
                       token === id ? (
                         <div
                           key={`${player}-${token}`}
-                          className={`w-6 h-6 rounded-full shadow-lg border-2 border-white ${color}`}
+                          className={`w-4/5 h-4/5 rounded-full shadow-lg border-2 border-white ${color}`}
                         />
                       ) : null,
                     ),
@@ -529,34 +529,36 @@ export default function Home() {
           </div>
         </div>
         {/* Dice */}
-        <div className="mt-4">
-          <button
-            onClick={rollDice}
-            className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md disabled:bg-blue-200"
-            disabled={diceValue !== null}
-          >
-            Roll Dice
-          </button>
-
-          {/* Conditionally render Pass button */}
-          {(currentPlayer === "red" && redAllBase) ||
-          (currentPlayer === "green" && greenAllBase) ||
-          (currentPlayer === "blue" && blueAllBase) ||
-          (currentPlayer === "yellow" && yellowAllBase) ? (
+        <div className="mt-6 flex flex-col items-center gap-4">
+          <div className="flex flex-wrap justify-center gap-3">
             <button
-              onClick={() => passToNextPlayer(currentPlayer)}
-              className="px-6 py-3 ml-5 bg-yellow-500 text-white rounded-lg shadow-md"
+              onClick={rollDice}
+              className="px-6 py-3 sm:px-6 sm:py-3 bg-blue-500 text-white rounded-lg shadow-md disabled:bg-blue-200"
+              disabled={diceValue !== null}
             >
-              Pass
+              Roll Dice
             </button>
-          ) : null}
 
-          {/* <button
+            {/* Conditionally render Pass button */}
+            {(currentPlayer === "red" && redAllBase) ||
+            (currentPlayer === "green" && greenAllBase) ||
+            (currentPlayer === "blue" && blueAllBase) ||
+            (currentPlayer === "yellow" && yellowAllBase) ? (
+              <button
+                onClick={() => passToNextPlayer(currentPlayer)}
+                className="px-6 py-3 sm:px-6 sm:py-3 ml-5 bg-yellow-500 text-white rounded-lg shadow-md"
+              >
+                Pass
+              </button>
+            ) : null}
+
+            {/* <button
             onClick={() => checkAllTokensInBase(currentPlayer)}
-            className="px-6 py-3 ml-5 bg-green-500 text-white rounded-lg shadow-md disabled:bg-blue-200"
+            className="px-6 py-3 sm:px-6 sm:py-3 ml-5 bg-green-500 text-white rounded-lg shadow-md disabled:bg-blue-200"
           >
             Check All in Base
           </button> */}
+          </div>
 
           {diceValue && (
             <p className="mt-2 text-xl">Dice Rolled: {diceValue}</p>
